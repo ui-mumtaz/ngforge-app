@@ -1,0 +1,87 @@
+<header class="sticky top-0 z-40 border-b backdrop-blur-md transition-colors"
+  [class.bg-slate-950/80]="theme.isDark()"
+  [class.border-slate-800/80]="theme.isDark()"
+  [class.text-white]="theme.isDark()"
+  [class.bg-white/80]="!theme.isDark()"
+  [class.border-slate-200]="!theme.isDark()"
+  [class.text-slate-900]="!theme.isDark()">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-3 shrink-0">
+      <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 via-rose-600 to-amber-600 shadow-md shadow-red-500/20 text-white font-black text-xl tracking-tighter">
+        <span class="font-mono">Ng</span>
+        <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950"></div>
+      </div>
+
+      <div class="hidden sm:block">
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-black tracking-tight bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 bg-clip-text text-transparent">
+            NgForge
+          </h1>
+        </div>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+          Standalone • Signals • Zoneless
+        </p>
+      </div>
+    </a>
+
+    <!-- Nav -->
+    <nav class="flex items-center gap-1 text-xs font-semibold">
+      <a routerLink="/" routerLinkActive="text-red-500 bg-red-500/10" [routerLinkActiveOptions]="{ exact: true }"
+        class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+        Home
+      </a>
+      <a routerLink="/generator" routerLinkActive="text-red-500 bg-red-500/10"
+        class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+        Generator
+      </a>
+      <a routerLink="/history" routerLinkActive="text-red-500 bg-red-500/10"
+        class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+        History
+      </a>
+      <a routerLink="/settings" routerLinkActive="text-red-500 bg-red-500/10"
+        class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+        Settings
+      </a>
+    </nav>
+
+    <!-- Controls -->
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        type="button"
+        (click)="history.toggleDrawer()"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer"
+        [class.bg-slate-900]="theme.isDark()"
+        [class.border-slate-800]="theme.isDark()"
+        [class.text-slate-300]="theme.isDark()"
+        [class.bg-slate-100]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.text-slate-700]="!theme.isDark()"
+        title="Quick history"
+      >
+        <span class="text-red-500 font-bold">⏱</span>
+        <span class="hidden md:inline">History</span>
+        @if (history.items().length > 0) {
+          <span class="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center font-bold">
+            {{ history.items().length }}
+          </span>
+        }
+      </button>
+
+      <button
+        type="button"
+        (click)="theme.toggle()"
+        class="p-2 rounded-xl border transition-all cursor-pointer"
+        [class.bg-slate-900]="theme.isDark()"
+        [class.border-slate-800]="theme.isDark()"
+        [class.text-amber-400]="theme.isDark()"
+        [class.bg-slate-100]="!theme.isDark()"
+        [class.border-slate-200]="!theme.isDark()"
+        [class.text-slate-700]="!theme.isDark()"
+        [attr.title]="theme.isDark() ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+      >
+        <span>{{ theme.isDark() ? '☀️' : '🌙' }}</span>
+      </button>
+    </div>
+  </div>
+</header>

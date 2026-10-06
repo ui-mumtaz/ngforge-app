@@ -1,0 +1,47 @@
+<div class="max-w-xl mx-auto flex flex-col gap-6" [formGroup]="form">
+  <h1 class="text-xl font-black text-slate-900 dark:text-white">Settings</h1>
+
+  <section class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl space-y-5">
+    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Appearance</h2>
+
+    <label class="flex items-center justify-between cursor-pointer">
+      <span class="text-sm text-slate-700 dark:text-slate-300">Dark theme</span>
+      <input type="checkbox" formControlName="darkMode" class="w-9 h-5 accent-red-600 cursor-pointer" />
+    </label>
+  </section>
+
+  <section class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl space-y-5">
+    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Generator Defaults</h2>
+
+    <div>
+      <label for="defaultType" class="block text-sm text-slate-700 dark:text-slate-300 mb-1.5">Default artifact type</label>
+      <select id="defaultType" formControlName="defaultType"
+        class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
+        @for (opt of typeOptions; track opt.type) {
+          <option [value]="opt.type">{{ opt.label }}</option>
+        }
+      </select>
+      <p class="text-[11px] text-slate-400 mt-1">Pre-selects the artifact type each time you open the Generator.</p>
+    </div>
+
+    <label class="flex items-center justify-between cursor-pointer">
+      <span class="text-sm text-slate-700 dark:text-slate-300">Auto-open live preview after generating</span>
+      <input type="checkbox" formControlName="autoOpenPreview" class="w-9 h-5 accent-red-600 cursor-pointer" />
+    </label>
+
+    <button type="button" (click)="resetPreferences()" class="text-xs text-red-500 hover:underline cursor-pointer">
+      Reset preferences to defaults
+    </button>
+  </section>
+
+  <section class="p-5 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 shadow-xl space-y-3">
+    <h2 class="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Danger Zone</h2>
+    <p class="text-xs text-slate-600 dark:text-slate-400">
+      Clears all {{ history.items().length }} saved generations and restores the 6 sample architectures.
+    </p>
+    <button type="button" (click)="clearHistory()"
+      class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer">
+      Clear All History
+    </button>
+  </section>
+</div>

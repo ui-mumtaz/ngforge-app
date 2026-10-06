@@ -1,0 +1,333 @@
+<div class="flex flex-col h-full rounded-xl overflow-hidden border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+
+  <!-- Sandbox Bar -->
+  <div class="flex items-center justify-between px-4 py-2.5 border-b text-xs bg-slate-50 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+    <div class="flex items-center gap-2">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span class="font-semibold text-slate-900 dark:text-white">Angular Sandbox</span>
+      <span class="text-slate-400">|</span>
+      <span class="font-mono text-[11px] text-red-500 font-medium">Standalone • OnPush • Signals</span>
+    </div>
+
+    <div class="flex items-center gap-1 bg-slate-200/60 dark:bg-slate-800/80 p-0.5 rounded-lg">
+      <button type="button" (click)="activeTab.set('ui')"
+        class="px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+        [class.bg-white]="activeTab() === 'ui'" [class.dark:bg-slate-700]="activeTab() === 'ui'"
+        [class.text-red-500]="activeTab() === 'ui'" [class.shadow-sm]="activeTab() === 'ui'">
+        Interactive UI
+      </button>
+      <button type="button" (click)="activeTab.set('signals')"
+        class="px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center gap-1"
+        [class.bg-white]="activeTab() === 'signals'" [class.dark:bg-slate-700]="activeTab() === 'signals'"
+        [class.text-red-500]="activeTab() === 'signals'" [class.shadow-sm]="activeTab() === 'signals'">
+        Signals State ({{ emittedEvents().length }})
+      </button>
+      @if (isDynamicForm()) {
+        <button type="button" (click)="activeTab.set('schema')"
+          class="px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+          [class.bg-white]="activeTab() === 'schema'" [class.dark:bg-slate-700]="activeTab() === 'schema'"
+          [class.text-red-500]="activeTab() === 'schema'" [class.shadow-sm]="activeTab() === 'schema'">
+          JSON Schema
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Main Sandbox Body -->
+  <div class="flex-1 overflow-auto p-4 md:p-6 flex flex-col justify-center items-center">
+    @if (activeTab() === 'ui') {
+      <div class="w-full max-w-md">
+        @if (submitSuccess()) {
+          <div class="mb-4 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
+            <span class="text-emerald-500 font-bold">✓</span>
+            <span>{{ submitSuccess() }}</span>
+          </div>
+        }
+
+        <!-- 1. Login Form Preview -->
+        @if (isLoginForm()) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl">
+            <div class="mb-5">
+              <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 mb-2">
+                ReactiveFormsModule + Signals
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Welcome Back</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Enter your credentials to test live signal validation</p>
+            </div>
+
+            <form (ngSubmit)="handleLoginSubmit()" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  [(ngModel)]="email"
+                  name="email"
+                  placeholder="alex@company.com"
+                  class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                />
+                @if (formTouched() && !isEmailValid()) {
+                  <p class="text-[11px] text-red-500 mt-1">Please enter a valid email address.</p>
+                }
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Password</label>
+                  <button type="button" (click)="forgotPassword()" class="text-[11px] text-red-500 hover:underline cursor-pointer">
+                    Forgot?
+                  </button>
+                </div>
+
+                <div class="relative">
+                  <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    [(ngModel)]="password"
+                    name="password"
+                    placeholder="••••••••"
+                    class="w-full px-3 py-2 pr-10 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                  />
+                  <button
+                    type="button"
+                    (click)="showPassword.set(!showPassword())"
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-200 cursor-pointer"
+                  >
+                    {{ showPassword() ? 'Hide' : 'Show' }}
+                  </button>
+                </div>
+
+                <!-- Computed Strength Meter -->
+                @if (password().length > 0) {
+                  <div class="mt-2 space-y-1">
+                    <div class="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                      <div
+                        class="h-full transition-all duration-300"
+                        [class.bg-red-500]="passwordStrength() === 1"
+                        [class.bg-amber-500]="passwordStrength() === 2"
+                        [class.bg-blue-500]="passwordStrength() === 3"
+                        [class.bg-emerald-500]="passwordStrength() === 4"
+                        [style.width.%]="passwordStrength() * 25"
+                      ></div>
+                    </div>
+                    <div class="flex justify-between text-[11px]">
+                      <span class="text-slate-500">Signal strength meter:</span>
+                      <span class="font-semibold text-red-500">{{ strengthText() }} ({{ passwordStrength() }}/4)</span>
+                    </div>
+                  </div>
+                }
+
+                @if (formTouched() && !isPasswordValid()) {
+                  <p class="text-[11px] text-red-500 mt-1">Password must be at least 8 characters.</p>
+                }
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  [(ngModel)]="rememberMe"
+                  name="rememberMe"
+                  class="rounded accent-red-600 w-4 h-4 cursor-pointer"
+                />
+                <label for="rememberMe" class="text-xs text-slate-600 dark:text-slate-400 cursor-pointer">
+                  Remember this device for 30 days
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="isSubmitting()"
+                class="w-full py-2.5 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition-all shadow-md shadow-red-500/20 cursor-pointer disabled:opacity-60"
+              >
+                @if (isSubmitting()) {
+                  <span>Emitting Credentials...</span>
+                } @else {
+                  <span>Sign In</span>
+                }
+              </button>
+            </form>
+          </div>
+        }
+
+        <!-- 2. Checkout Wizard Preview -->
+        @if (isCheckout()) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-red-500 uppercase tracking-wider">
+                Step {{ wizardStep() === 'shipping' ? 1 : wizardStep() === 'billing' ? 2 : 3 }} of 3
+              </span>
+              <span class="text-xs text-slate-500">{{ wizardStep() }}</span>
+            </div>
+            <div class="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-red-600 transition-all duration-300"
+                [style.width.%]="wizardStep() === 'shipping' ? 33 : wizardStep() === 'billing' ? 66 : 100">
+              </div>
+            </div>
+
+            @if (wizardStep() === 'shipping') {
+              <div class="space-y-3">
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Shipping Address</h4>
+                <input [(ngModel)]="shippingFullName" placeholder="Full Name" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+                <input [(ngModel)]="shippingAddress" placeholder="Street Address" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+                <button type="button" (click)="wizardStep.set('billing')" class="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">
+                  Next: Payment Info →
+                </button>
+              </div>
+            }
+
+            @if (wizardStep() === 'billing') {
+              <div class="space-y-3">
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Payment Method</h4>
+                <input [(ngModel)]="billingCardName" placeholder="Name on Card" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+                <input [(ngModel)]="billingCardNumber" placeholder="Card Number (16 digits)" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+                <div class="flex gap-2">
+                  <button type="button" (click)="wizardStep.set('shipping')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold cursor-pointer">← Back</button>
+                  <button type="button" (click)="wizardStep.set('review')" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">Review Order →</button>
+                </div>
+              </div>
+            }
+
+            @if (wizardStep() === 'review') {
+              <div class="space-y-3">
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white">Order Summary</h4>
+                <div class="p-3 bg-slate-100 dark:bg-slate-900 rounded text-xs space-y-1">
+                  <p class="font-semibold text-slate-800 dark:text-slate-200">Delivery: {{ shippingFullName }}</p>
+                  <p class="text-slate-500 dark:text-slate-400">{{ shippingAddress }}</p>
+                  <p class="text-slate-500 dark:text-slate-400">Payment: {{ billingCardName }} (•••• 8901)</p>
+                </div>
+                <div class="flex gap-2">
+                  <button type="button" (click)="wizardStep.set('billing')" class="flex-1 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold cursor-pointer">← Back</button>
+                  <button type="button" (click)="completeOrder()" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">Complete Order ($149.00)</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- 3. Dynamic Form Preview -->
+        @if (isDynamicForm()) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3.5">
+            <div class="mb-2">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-500/10 text-red-500 mb-1">
+                JSON Schema-Driven Form
+              </span>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white">Dynamic Form Renderer</h3>
+              <p class="text-xs text-slate-500">Live schema evaluation with reactive conditional visibility</p>
+            </div>
+
+            <form (ngSubmit)="handleDynamicSubmit()" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name *</label>
+                <input [(ngModel)]="dynFullName" name="dynFullName" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Account Role</label>
+                <select [(ngModel)]="dynRole" name="dynRole" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                  <option value="developer">Developer</option>
+                  <option value="admin">Enterprise Admin</option>
+                  <option value="auditor">Security Auditor</option>
+                </select>
+              </div>
+              @if (dynRole === 'admin') {
+                <div>
+                  <label class="block text-xs font-semibold text-amber-500 mb-1">Enterprise Security Key (Conditional) *</label>
+                  <input [(ngModel)]="dynSecurityToken" name="dynSecurityToken" placeholder="SEC-XXXX-99" class="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-600/50 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" />
+                </div>
+              }
+              <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">
+                Submit Dynamic Form
+              </button>
+            </form>
+          </div>
+        }
+
+        <!-- 4. Service / Directive fallback -->
+        @if (!isLoginForm() && !isCheckout() && !isDynamicForm()) {
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+            <div class="flex justify-between items-center">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">{{ output().componentName }}</h3>
+              <span class="px-2.5 py-1 rounded bg-red-500/10 text-red-500 text-xs font-semibold">
+                {{ output().type }}
+              </span>
+            </div>
+            <div class="p-3 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs space-y-2 font-mono">
+              <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                <span>Architecture:</span>
+                <span class="text-emerald-600 dark:text-emerald-400">Standalone + Signals</span>
+              </div>
+              <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                <span>Detection:</span>
+                <span class="text-blue-600 dark:text-blue-400">OnPush</span>
+              </div>
+            </div>
+            <button type="button" (click)="triggerGenericAction()" class="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">
+              Trigger Component Action
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TAB: Signals Inspector -->
+    @if (activeTab() === 'signals') {
+      <div class="w-full max-w-lg space-y-4">
+        <div class="p-4 rounded-xl bg-slate-950 text-slate-200 font-mono text-xs border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+            <span class="text-red-400 font-bold">Active Signals Graph</span>
+            <span class="text-[11px] text-slate-500">Zone-less Core</span>
+          </div>
+          <div class="space-y-2 text-[12px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">isGenerating():</span>
+              <span class="text-amber-400">{{ generator.isGenerating() ? 'true' : 'false' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">passwordStrength():</span>
+              <span class="text-emerald-400">{{ passwordStrength() }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">showPassword():</span>
+              <span class="text-blue-400">{{ showPassword() ? 'true' : 'false' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-950 text-slate-200 font-mono text-xs border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+            <span class="text-blue-400 font-bold">Signal Emissions Log</span>
+            <span class="text-[11px] text-slate-500">{{ emittedEvents().length }} events</span>
+          </div>
+          @if (emittedEvents().length === 0) {
+            <div class="text-slate-500 text-center py-4 text-xs italic">
+              Interact with the UI tab to see emitted signal events.
+            </div>
+          } @else {
+            <div class="space-y-2 max-h-48 overflow-auto">
+              @for (evt of emittedEvents(); track $index) {
+                <div class="p-2 bg-slate-900 rounded border border-slate-800 text-[11px]">
+                  <div class="flex justify-between items-center text-emerald-400 font-bold">
+                    <span>{{ evt.name }}</span>
+                    <span class="text-slate-500">{{ evt.time }}</span>
+                  </div>
+                  <pre class="text-slate-300 mt-1 m-0">{{ evt.payload | json }}</pre>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- TAB: JSON Schema -->
+    @if (activeTab() === 'schema') {
+      <div class="w-full max-w-lg p-4 rounded-xl bg-slate-950 text-slate-200 font-mono text-xs border border-slate-800 shadow-xl">
+        <h4 class="text-emerald-400 font-bold mb-2">DynamicFieldSchema[] Config</h4>
+        <pre class="overflow-auto max-h-96 text-[12px] leading-relaxed text-slate-300">{{ defaultSchema | json }}</pre>
+      </div>
+    }
+  </div>
+</div>

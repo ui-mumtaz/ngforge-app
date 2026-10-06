@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@import "@angular/cdk/overlay-prebuilt.css";
+
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme; ThemeService instead
+   toggles a `.dark` class on <html>, so repoint the variant at that class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+.ngforge-backdrop {
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  border-radius: 0.75rem;
+}
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@layer base {
+  :root {
+    --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+}
+
+html, body {
+  height: 100%;
+}
+
+code, pre {
+  font-family: var(--font-code);
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+@keyframes toast-slide-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-slide-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateX(16px) scale(0.98); }
+}
+.toast-enter {
+  animation: toast-slide-in 200ms ease-out;
+}
+.toast-leave {
+  animation: toast-slide-out 180ms ease-in forwards;
+}
+
+/* Prism highlight theme adjustments */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #64748b;
+  font-style: italic;
+}
+.token.punctuation {
+  color: #94a3b8;
+}
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f43f5e;
+}
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #10b981;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #38bdf8;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #c084fc;
+}
+.token.function,
+.token.class-name {
+  color: #fbbf24;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #f97316;
+}

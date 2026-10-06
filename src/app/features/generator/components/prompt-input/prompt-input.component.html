@@ -1,0 +1,133 @@
+<div class="flex flex-col gap-5 p-5 rounded-2xl border shadow-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+  [formGroup]="generator.promptForm">
+
+  <!-- 1. Type Selector -->
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+        <span class="text-red-500">▶</span>
+        1. Select Artifact Type
+      </label>
+      <span class="text-[11px] font-mono text-red-500 font-semibold bg-red-500/10 px-2 py-0.5 rounded">
+        {{ activeConfig().badge }}
+      </span>
+    </div>
+
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      @for (item of typeOptions; track item.type) {
+        <button
+          type="button"
+          (click)="generator.promptForm.controls.type.setValue(item.type)"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border"
+          [class.bg-red-600]="generator.promptForm.controls.type.value === item.type"
+          [class.text-white]="generator.promptForm.controls.type.value === item.type"
+          [class.border-red-600]="generator.promptForm.controls.type.value === item.type"
+          [class.shadow-md]="generator.promptForm.controls.type.value === item.type"
+          [class.bg-slate-100]="generator.promptForm.controls.type.value !== item.type"
+          [class.dark:bg-slate-800/80]="generator.promptForm.controls.type.value !== item.type"
+          [class.text-slate-700]="generator.promptForm.controls.type.value !== item.type"
+          [class.dark:text-slate-300]="generator.promptForm.controls.type.value !== item.type"
+          [class.border-slate-200]="generator.promptForm.controls.type.value !== item.type"
+          [class.dark:border-slate-700/80]="generator.promptForm.controls.type.value !== item.type"
+        >
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- 2. Natural Language Prompt Box (Reactive Forms) -->
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between">
+      <label for="promptTextarea" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+        <span class="text-amber-500">✨</span>
+        2. Describe Your Architecture Prompt
+      </label>
+      <span class="text-[11px] text-slate-400 font-mono hidden sm:inline">
+        Press ⌘+Enter to forge
+      </span>
+    </div>
+
+    <div class="relative">
+      <textarea
+        id="promptTextarea"
+        formControlName="prompt"
+        (keydown)="handleKeyDown($event)"
+        rows="4"
+        [placeholder]="activeConfig().placeholder"
+        class="w-full p-4 rounded-xl text-sm leading-relaxed border transition-all resize-none bg-slate-50 dark:bg-slate-950/80 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white"
+        aria-describedby="prompt-feedback"
+      ></textarea>
+
+      @if (generator.promptForm.controls.prompt.invalid && generator.promptForm.controls.prompt.touched) {
+        <p id="prompt-feedback" class="text-[11px] text-red-500 mt-1">
+          Describe your component in at least 5 characters.
+        </p>
+      }
+
+      <div class="flex items-center justify-between mt-2">
+        <button
+          type="button"
+          (click)="generator.promptForm.controls.prompt.setValue('')"
+          [disabled]="!generator.promptForm.controls.prompt.value"
+          class="text-[11px] text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-30 cursor-pointer"
+        >
+          Clear
+        </button>
+
+        <button
+          type="button"
+          (click)="generator.generate()"
+          [disabled]="generator.promptForm.invalid || generator.isGenerating()"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold tracking-wide transition-all shadow-lg shadow-red-600/25 disabled:opacity-50 cursor-pointer"
+        >
+          @if (generator.isGenerating()) {
+            <div class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <span>Forging Angular Architecture...</span>
+          } @else {
+            <span>✨ Forge Angular Code</span>
+            <span>→</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Preloaded Realistic Samples -->
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        3. Or Load Realistic Sample Architectures
+      </span>
+      <span class="text-[10px] text-slate-400">{{ generator.sampleList.length }} Preloaded Templates</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+      @for (sample of generator.sampleList; track sample.id) {
+        <button
+          type="button"
+          (click)="generator.loadSample(sample)"
+          class="text-left p-2.5 rounded-xl border text-xs transition-all cursor-pointer group flex flex-col justify-between bg-slate-50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-red-400 dark:hover:border-red-500/50"
+        >
+          <div>
+            <span class="font-semibold text-slate-900 dark:text-slate-200 group-hover:text-red-500 transition-colors line-clamp-1 block mb-1">
+              {{ sample.title }}
+            </span>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-snug">
+              {{ sample.prompt }}
+            </p>
+          </div>
+
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-red-500/10 text-red-500 font-medium">
+              {{ sample.type }}
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">
+              .{{ sample.fileName.split('.').pop() }}
+            </span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+</div>

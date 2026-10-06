@@ -1,0 +1,202 @@
+<div class="flex flex-col h-full rounded-2xl border shadow-xl overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+
+  <!-- Top Bar -->
+  <div class="px-5 py-3.5 border-b flex flex-wrap items-center justify-between gap-3 border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/60">
+
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="history.toggleFavorite(output().id)"
+        class="p-1.5 rounded-lg border transition-all cursor-pointer"
+        [class.bg-amber-500/10]="output().isFavorite"
+        [class.border-amber-500/30]="output().isFavorite"
+        [class.text-amber-500]="output().isFavorite"
+        [class.border-slate-200]="!output().isFavorite"
+        [class.dark:border-slate-700/40]="!output().isFavorite"
+        [class.text-slate-400]="!output().isFavorite"
+        title="Toggle favorite"
+      >
+        ★
+      </button>
+
+      <div>
+        <div class="flex items-center gap-2">
+          <h2 class="text-base font-bold text-slate-900 dark:text-white leading-tight">
+            {{ output().componentName }}
+          </h2>
+          <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+            {{ output().type }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+          src/app/.../{{ output().fileName }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Global Actions -->
+    <div class="flex items-center flex-wrap gap-2">
+      <!-- Layout Switcher -->
+      <div class="flex items-center bg-slate-200/60 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-300 dark:border-slate-700">
+        <button type="button" (click)="layoutMode.set('split')"
+          class="px-2 py-1 rounded text-xs font-medium cursor-pointer"
+          [class.bg-white]="layoutMode() === 'split'" [class.dark:bg-slate-700]="layoutMode() === 'split'"
+          [class.text-red-500]="layoutMode() === 'split'" title="Split Code & Live Preview">
+          ◫ Split
+        </button>
+        <button type="button" (click)="layoutMode.set('code-only')"
+          class="px-2 py-1 rounded text-xs font-medium cursor-pointer"
+          [class.bg-white]="layoutMode() === 'code-only'" [class.dark:bg-slate-700]="layoutMode() === 'code-only'"
+          [class.text-red-500]="layoutMode() === 'code-only'" title="Code View Only">
+          📄 Code
+        </button>
+        <button type="button" (click)="layoutMode.set('preview-only')"
+          class="px-2 py-1 rounded text-xs font-medium cursor-pointer"
+          [class.bg-white]="layoutMode() === 'preview-only'" [class.dark:bg-slate-700]="layoutMode() === 'preview-only'"
+          [class.text-red-500]="layoutMode() === 'preview-only'" title="Preview Only">
+          👁 Preview
+        </button>
+      </div>
+
+      <button
+        type="button"
+        [cdkCopyToClipboard]="combinedFiles()"
+        (cdkCopyToClipboardCopied)="onCopyAll($event)"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-medium transition-all cursor-pointer"
+      >
+        <span>📋 Copy All</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="downloadZip()"
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-medium shadow-sm shadow-red-500/20 transition-all cursor-pointer"
+      >
+        <span>⬇ Download .zip</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="generator.generate()"
+        [disabled]="generator.isGenerating()"
+        class="p-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 cursor-pointer disabled:opacity-50"
+        title="Regenerate"
+      >
+        ↻
+      </button>
+    </div>
+  </div>
+
+  <!-- File Tabs Navigation -->
+  <div class="px-5 border-b flex items-center justify-between overflow-x-auto border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/30">
+    <div class="flex items-center space-x-1">
+      <button type="button" (click)="activeTab.set('ts')"
+        class="py-2.5 px-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap"
+        [class.border-red-500]="activeTab() === 'ts'" [class.text-red-500]="activeTab() === 'ts'"
+        [class.border-transparent]="activeTab() !== 'ts'">
+        TypeScript (.ts)
+      </button>
+
+      @if (output().type !== 'Service' && output().type !== 'Pipe' && output().type !== 'Guard/Interceptor') {
+        <button type="button" (click)="activeTab.set('html')"
+          class="py-2.5 px-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap"
+          [class.border-red-500]="activeTab() === 'html'" [class.text-red-500]="activeTab() === 'html'"
+          [class.border-transparent]="activeTab() !== 'html'">
+          HTML Template
+        </button>
+
+        <button type="button" (click)="activeTab.set('scss')"
+          class="py-2.5 px-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap"
+          [class.border-red-500]="activeTab() === 'scss'" [class.text-red-500]="activeTab() === 'scss'"
+          [class.border-transparent]="activeTab() !== 'scss'">
+          SCSS Styles
+        </button>
+      }
+
+      <button type="button" (click)="activeTab.set('spec')"
+        class="py-2.5 px-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap"
+        [class.border-red-500]="activeTab() === 'spec'" [class.text-red-500]="activeTab() === 'spec'"
+        [class.border-transparent]="activeTab() !== 'spec'">
+        Unit Test (.spec.ts)
+      </button>
+
+      <button type="button" (click)="activeTab.set('usage')"
+        class="py-2.5 px-3 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap"
+        [class.border-red-500]="activeTab() === 'usage'" [class.text-red-500]="activeTab() === 'usage'"
+        [class.border-transparent]="activeTab() !== 'usage'">
+        Usage Guide
+      </button>
+    </div>
+
+    <div class="hidden lg:flex items-center gap-1.5 py-1">
+      @for (tag of output().tags.slice(0, 3); track tag) {
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-200/60 dark:bg-slate-800 text-slate-500">
+          #{{ tag }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- Main Area -->
+  <div class="flex-1 min-h-0 overflow-hidden p-3 md:p-4">
+    @if (layoutMode() === 'split') {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+        <div class="h-full min-h-[350px]">
+          <app-code-viewer [code]="activeCodeContent()!.code" [language]="activeCodeContent()!.lang" [fileName]="activeCodeContent()!.file" />
+        </div>
+        <div class="h-full min-h-[350px]">
+          <app-live-preview [output]="output()" />
+        </div>
+      </div>
+    }
+
+    @if (layoutMode() === 'code-only') {
+      <div class="h-full">
+        <app-code-viewer [code]="activeCodeContent()!.code" [language]="activeCodeContent()!.lang" [fileName]="activeCodeContent()!.file" />
+      </div>
+    }
+
+    @if (layoutMode() === 'preview-only') {
+      <div class="h-full">
+        <app-live-preview [output]="output()" />
+      </div>
+    }
+  </div>
+
+  <!-- Refine Footer -->
+  <div class="px-4 py-2.5 border-t flex flex-wrap items-center justify-between gap-2 text-xs border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/70"
+    [formGroup]="refineForm">
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-slate-500 font-medium">✨ Refine Output:</span>
+      @for (preset of refinementPresets; track preset) {
+        <button
+          type="button"
+          (click)="generator.generate(preset)"
+          [disabled]="generator.isGenerating()"
+          class="px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-red-500 text-slate-700 dark:text-slate-300 hover:text-red-500 text-[11px] transition-all cursor-pointer disabled:opacity-50"
+        >
+          + {{ preset }}
+        </button>
+      }
+      <button type="button" (click)="showRefineInput.set(!showRefineInput())" class="text-[11px] text-red-500 hover:underline cursor-pointer font-medium ml-1">
+        {{ showRefineInput() ? 'Cancel' : 'Custom Refine...' }}
+      </button>
+    </div>
+
+    @if (showRefineInput()) {
+      <div class="w-full flex items-center gap-2 mt-2 pt-2 border-t border-slate-800">
+        <input
+          type="text"
+          formControlName="customRefinement"
+          placeholder="e.g. Add dark mode classes, add async validator with debounce..."
+          class="flex-1 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-white text-xs focus:outline-none focus:border-red-500"
+          (keydown.enter)="applyCustomRefine()"
+        />
+        <button type="button" (click)="applyCustomRefine()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer">
+          Apply Refinement
+        </button>
+      </div>
+    }
+  </div>
+</div>
